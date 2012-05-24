@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 #define BAUDRATE B115200
-#define MODEMDEVICE "/dev/ttyUSB0"
+#define MODEMDEVICE "/dev/ttyS0"
 #define _POSIX_SOURCE 1
 
 #define FALSE 0
@@ -65,6 +65,12 @@ void packData(float x,float y,float z,unsigned char good)
 
 int main(int argc, char** argv)
 {
+	if(argc == 1)
+	{
+		ROS_ERROR("Specify serial port. e.g., /dev/ttyUSB0");
+		return -1;
+	}
+
 	ros::init(argc, argv, "ar_listener");
 	ros::NodeHandle node;
 	tf::TransformListener listener;
@@ -73,9 +79,18 @@ int main(int argc, char** argv)
 	int fd;
 	struct termios newtio;
 	
-	// open
-	fd = open(MODEMDEVICE, O_RDWR | O_NOCTTY ); 
-	if (fd <0) {perror(MODEMDEVICE); exit(-1); }
+	// open, we trust a user should enter /dev/ttyS0 or so.
+	fd = open(argv[1], O_RDWR | O_NOCTTY ); 
+	if (fd <0) 
+	{
+		ROS_ERROR("Serial port open error %s",argv[1]);
+		perror(MODEMDEVICE); 
+		exit(-1); 
+	}
+	else
+	{
+		ROS_INFO("Connected to %s successfully.",argv[1]);
+	}
 
 	bzero(&newtio, sizeof(newtio)); /* clear struct for new port settings */
 
@@ -118,7 +133,7 @@ int main(int argc, char** argv)
 		}
 		catch(tf::TransformException ex)
 		{
-			ROS_ERROR("%s",ex.what());
+			//ROS_ERROR("%s",ex.what());
 			packData(0.0,0.0,0.0,0);
 			write(fd,toHeli,16);
 			ros::spinOnce();

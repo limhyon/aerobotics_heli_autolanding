@@ -1,0 +1,17 @@
+<package>
+  <description brief="nrl_heli_server">
+
+     nrl_heli_server
+
+  </description>
+  <author>Hyon Lim</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/nrl_heli_server</url>
+  <depend package="ar_pose"/>
+  <depend package="ar_pose_serial"/>
+  <depend package="pgr_camera_driver"/>
+
+</package>
+
+

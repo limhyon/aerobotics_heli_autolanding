@@ -1,0 +1,8 @@
+
+1. Instruction
+
+Helicopter side (fitPC)
+ $ roslaunch nrl_heli_server heli.launch
+
+Client side (normal laptop)
+ $ roslaunch nrl_heli_client heli_view.launch

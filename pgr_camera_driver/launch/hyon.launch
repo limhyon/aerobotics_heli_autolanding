@@ -1,0 +1,45 @@
+
+	<!--
+		mono.launch Start a pgr_camera node at 640x480, 15 FPS, Y8. Also start
+		an image_view.
+	-->
+<launch>
+  <!-- Variable names -->
+  <arg name="camera_node" default="usb_cam" />
+  <!--<arg name="calibration_file" default="file://$(find pgr_camera_driver)/test_intrinsics.ini" />-->
+  <arg name="calibration_file" default="file://$(find pgr_camera_driver)/fmvu-03mtm-1.6mm.ini" />
+    
+  <node name="$(arg camera_node)" pkg="pgr_camera_driver" type="pgr_camera_node" respawn="false" output="screen">
+        <!-- HAS NO EFFECT HERE (b/c parameters are set through dynamic_reconfigure)
+        <param name="width" type="int" value="640" /> # Default 640
+        <param name="height" type="int" value="480" /> # Default 480
+        <param name="format" value="Y8" /> # Y8 works with Color (Don't Select RGB if you don't know)
+        <param name="frame_rate" type="int" value="30" />
+        <param name="camera_name" type="str" value="pgr_camera" />
+        -->
+        
+        # NECESSARY:  
+        <param name="intrinsics_ini" type="str" value="$(arg calibration_file)" />
+  </node> 
+  
+<node name="ar_pose" pkg="ar_pose" type="ar_single" respawn="false" output="screen">
+                <!--<param name="marker_pattern" type="string" value="data/patt.hiro"/>-->
+                <param name="marker_pattern" type="string" value="data/patt.sample1"/>
+                <param name="marker_width" type="double" value="200.0"/>
+                <param name="marker_center_x" type="double" value="0.0"/>
+                <param name="marker_center_y" type="double" value="0.0"/>
+                <param name="threshold" type="int" value="100"/>
+                <param name="use_history" type="bool" value="true"/>
+    <param name="reverse_transform" type="bool" value="true"/>
+        </node>
+
+ <node pkg="tf" type="static_transform_publisher" name="world_to_marker"
+     args="0 0 0 0 0 0 world ar_marker 10" />
+
+<node pkg="rviz" type="rviz" name="rviz"
+            args="-d $(find ar_pose)/launch/live_reverse.vcg"/>
+
+<node pkg="dynamic_reconfigure" name="reconfig" type="reconfigure_gui" />
+
+</launch>
+

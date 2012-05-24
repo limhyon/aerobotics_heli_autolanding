@@ -1,0 +1,8 @@
+digraph G {
+"/world" -> "/ar_marker"[label="Broadcaster: /world_to_marker\nAverage rate: 98.830 Hz\nMost recent transform: 0.000 sec old \nBuffer length: 4.948 sec\n"];
+"/ar_marker" -> "/pgr_camera_frame"[label="Broadcaster: /ar_pose\nAverage rate: 15.218 Hz\nMost recent transform: 0.041 sec old \nBuffer length: 4.863 sec\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1337792146.875"[ shape=plaintext ] ;
+ }->"/world";
+}

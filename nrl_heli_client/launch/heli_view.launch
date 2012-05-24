@@ -1,0 +1,8 @@
+<launch>
+<node pkg="rviz" type="rviz" name="rviz"
+            args="-d $(find nrl_heli_client)/launch/heli_view.vcg"/>
+
+<node pkg="dynamic_reconfigure" name="reconfig" type="reconfigure_gui" />
+
+</launch>
+

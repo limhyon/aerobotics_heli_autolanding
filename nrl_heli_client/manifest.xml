@@ -1,0 +1,18 @@
+<package>
+  <description brief="nrl_heli_client">
+
+     nrl_heli_client
+
+  </description>
+  <author>Hyon</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/nrl_heli_client</url>
+  <depend package="ar_pose"/>
+  <depend package="ar_pose_serial"/>
+  <depend package="artoolkit"/>
+  <depend package="pgr_camera_driver"/>
+
+</package>
+
+

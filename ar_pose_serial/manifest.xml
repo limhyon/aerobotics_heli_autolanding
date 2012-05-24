@@ -1,0 +1,16 @@
+<package>
+  <description brief="ar_pose_serial">
+
+     ar_pose_serial
+
+  </description>
+  <author>Hyon</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/ar_pose_serial</url>
+  <depend package="tf"/>
+  <depend package="roscpp"/>
+
+</package>
+
+

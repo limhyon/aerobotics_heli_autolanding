@@ -1,0 +1,14 @@
+<stack>
+  <description brief="Aerobotics Helicopter Autolanding Helper">Aerobotics Helicopter Landing Helper</description>
+  <author>Maintained by Hyon Lim</author>
+  <license>GPL</license>  
+  <review status="experimental" notes=""/>
+  <url>http://ros.org/wiki/aerobotics_heli</url>
+  <depend stack="common_msgs" />
+  <depend stack="geometry" />
+  <depend stack="image_common" />
+  <depend stack="robot_model" />
+  <depend stack="ros" />
+  <depend stack="vision_opencv" />
+  <depend stack="visualization_common" />
+</stack>

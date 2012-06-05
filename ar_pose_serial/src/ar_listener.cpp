@@ -1,12 +1,13 @@
 #include <ros/ros.h>
 #include <tf/transform_listener.h>
-
+#include <std_msgs/Bool.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <termios.h>
 #include <stdio.h>
 #include <math.h>
+#include <sys/signal.h>
 
 #define BAUDRATE B115200
 #define MODEMDEVICE "/dev/ttyS0"
@@ -22,6 +23,8 @@
 	#define RAD2DEG (180.0/M_PI)
 #endif
 
+#define PKT_LENGTH	28	
+
 //include header, total 16bytes.
 // header 2byte
 // data 3*float(12) + 1byte = 13;
@@ -33,8 +36,9 @@ union
 	unsigned char fti[4];
 } p;
 
-unsigned char toHeli[16] = {0x00};
+unsigned char toHeli[PKT_LENGTH] = {0x00};
 double roll,pitch,yaw;
+bool wait_flag = true;
 
 void packData(float x,float y,float z,unsigned char good)
 {
@@ -59,14 +63,37 @@ void packData(float x,float y,float z,unsigned char good)
 	toHeli[12] = p.fti[1] & 0xff;
 	toHeli[13] = p.fti[0] & 0xff;
 
-	toHeli[14] = good;
+	p.ft = (float)roll;
+	toHeli[14] = p.fti[3] & 0xff;
+	toHeli[15] = p.fti[2] & 0xff;
+	toHeli[16] = p.fti[1] & 0xff;
+	toHeli[17] = p.fti[0] & 0xff;
 
-	toHeli[15] = 0;
+	p.ft = (float)pitch;
+	toHeli[18] = p.fti[3] & 0xff;
+	toHeli[19] = p.fti[2] & 0xff;
+	toHeli[20] = p.fti[1] & 0xff;
+	toHeli[21] = p.fti[0] & 0xff;
 
-	for(int i=2;i<=14;i++)
+	p.ft = (float)yaw;
+	toHeli[22] = p.fti[3] & 0xff;
+	toHeli[23] = p.fti[2] & 0xff;
+	toHeli[24] = p.fti[1] & 0xff;
+	toHeli[25] = p.fti[0] & 0xff;
+
+	toHeli[26] = good;
+
+	toHeli[27] = 0;
+
+	for(int i=2;i<=26;i++)
 	{
-		toHeli[15] ^= toHeli[i];
+		toHeli[27] ^= toHeli[i];
 	}
+}
+
+void signal_handler_IO(int status)
+{
+	//wait_flag = false;
 }
 
 int main(int argc, char** argv)
@@ -83,13 +110,18 @@ int main(int argc, char** argv)
 	ros::init(argc, argv, "ar_listener");
 	ros::NodeHandle node;
 	tf::TransformListener listener;
-	
+
+	// Autopilot control status topic creation
+	ros::Publisher control_status = node.advertise<std_msgs::Bool>("isauto",1000);
+	 
 	// Serial comm related
 	int fd;
 	struct termios newtio;
+	struct sigaction saio;
 	
 	// open, we trust a user should enter /dev/ttyS0 or so.
-	fd = open(argv[1], O_RDWR | O_NOCTTY ); 
+	fd = open(argv[1], O_RDWR | O_NOCTTY | O_NONBLOCK); 
+
 	if (fd <0) 
 	{
 		ROS_ERROR("Serial port open error %s",argv[1]);
@@ -100,6 +132,15 @@ int main(int argc, char** argv)
 	{
 		ROS_INFO("Connected to %s successfully.",argv[1]);
 	}
+
+	saio.sa_handler = signal_handler_IO;
+	//saio.sa_mask = 0;
+	sigemptyset(&saio.sa_mask);
+	saio.sa_flags = 0;
+	saio.sa_restorer = NULL;
+	sigaction(SIGIO,&saio,NULL);
+	fcntl(fd,F_SETOWN,getpid());
+	fcntl(fd,F_SETFL,FASYNC);
 
 	bzero(&newtio, sizeof(newtio)); /* clear struct for new port settings */
 
@@ -133,6 +174,7 @@ int main(int argc, char** argv)
 
 	while (node.ok())
 	{
+		std_msgs::Bool isauto;
 		tf::StampedTransform transform;
 		tf::Quaternion attitude;
 		success = true;
@@ -170,13 +212,24 @@ int main(int argc, char** argv)
 			yaw = yaw*RAD2DEG;
 			ROS_DEBUG("[%06d]:LOC(%f,%f,%f),RPY:(%f,%f,%f)",count++,transform.getOrigin().x(),transform.getOrigin().y(),transform.getOrigin().z(),roll,pitch,yaw);
 			
+			isauto.data = true;
+			control_status.publish(isauto);
 		}
 		else
 		{
 			packData(0.0,0.0,0.0,0);
 		}
 
-		write(fd,toHeli,16);
+		if(wait_flag == false)
+		{
+			ROS_INFO("Serial received!");
+			wait_flag = true;
+			// res = read(fd,buf,255);
+			// See http://www.faqs.org/docs/Linux-HOWTO/Serial-Programming-HOWTO.html
+		}
+
+
+		write(fd,toHeli,PKT_LENGTH);
 		ros::spinOnce();
 		rate.sleep();
 	}

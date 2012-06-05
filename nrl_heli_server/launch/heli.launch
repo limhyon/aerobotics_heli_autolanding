@@ -17,7 +17,7 @@
         <param name="intrinsics_ini" type="str" value="$(arg calibration_file)" />
   </node> 
   
-<node name="ar_pose" pkg="ar_pose" type="ar_single" respawn="false" output="screen">
+	<node name="ar_pose" pkg="ar_pose" type="ar_single" respawn="false" output="screen">
                 <!--<param name="marker_pattern" type="string" value="data/patt.hiro"/>-->
                 <param name="marker_pattern" type="string" value="data/patt.sample1"/>
                 <param name="marker_width" type="double" value="202.0"/>
@@ -25,13 +25,13 @@
                 <param name="marker_center_y" type="double" value="0.0"/>
                 <param name="threshold" type="int" value="100"/>
                 <param name="use_history" type="bool" value="true"/>
-    <param name="reverse_transform" type="bool" value="true"/>
+    		<param name="reverse_transform" type="bool" value="true"/>
         </node>
 
- <node pkg="tf" type="static_transform_publisher" name="world_to_marker"
-     args="0 0 0 0 0 0 world ar_marker 10" />
+	<node pkg="tf" type="static_transform_publisher" name="world_to_marker" args="0 0 0 0 0 0 world ar_marker 10" />
 
-<node name="ar_listener" pkg="ar_pose_serial" type="ar_listener" output="screen" respawn="false" args="/dev/ttyS0" />
+	<!-- Serial Output -->
+	<node name="ar_listener" pkg="ar_pose_serial" type="ar_listener" output="screen" respawn="false" args="/dev/ttyS0" />
 
 </launch>
 

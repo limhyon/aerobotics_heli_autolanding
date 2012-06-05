@@ -1,0 +1,11 @@
+<launch>
+<!-- Variable names -->
+  <arg name="camera_node" default="usb_cam" />
+  <!--<arg name="calibration_file" default="file://$(find pgr_camera_driver)/test_intrinsics.ini" />-->
+  <arg name="calibration_file" default="file://$(find pgr_camera_driver)/fmvu-03mtm-1.6mm.ini" />
+<param name="/use_sim_time" value="true"/>
+<node pkg="rviz" type="rviz" name="rviz"
+            args="-d $(find nrl_heli_client)/launch/heli_view.vcg"/>
+<node pkg="rosbag" type="rosbag" name="rosbag" args="play $(find nrl_heli_client)/bags/2012-06-05-22-43-52.bag --delay=1 --clock"/>
+</launch>
+

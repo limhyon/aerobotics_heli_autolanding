@@ -3,6 +3,6 @@
             args="-d $(find nrl_heli_client)/launch/heli_view.vcg"/>
 
 <node pkg="dynamic_reconfigure" name="reconfig" type="reconfigure_gui" />
-
+<node pkg="image_transport" name="republish" type="republish" args="compressed in:=/usb_cam/image_raw out:=/usb_cam_repub/image_raw"/>
 </launch>
 

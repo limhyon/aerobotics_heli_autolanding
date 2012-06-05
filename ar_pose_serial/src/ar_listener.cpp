@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <stdio.h>
+#include <math.h>
 
 #define BAUDRATE B115200
 #define MODEMDEVICE "/dev/ttyS0"
@@ -16,6 +17,10 @@
 
 #define HEADER1 0xFF
 #define HEADER2 0xEA
+
+#ifndef RAD2DEG
+	#define RAD2DEG (180.0/M_PI)
+#endif
 
 //include header, total 16bytes.
 // header 2byte
@@ -29,6 +34,7 @@ union
 } p;
 
 unsigned char toHeli[16] = {0x00};
+double roll,pitch,yaw;
 
 void packData(float x,float y,float z,unsigned char good)
 {
@@ -65,6 +71,9 @@ void packData(float x,float y,float z,unsigned char good)
 
 int main(int argc, char** argv)
 {
+	unsigned int count = 0;
+	roll = pitch = yaw = 0.0;
+
 	if(argc == 1)
 	{
 		ROS_ERROR("Specify serial port. e.g., /dev/ttyUSB0");
@@ -119,29 +128,54 @@ int main(int argc, char** argv)
 	tcflush(fd,TCIFLUSH);
 	tcsetattr(fd,TCSANOW,&newtio);
 
-	ros::Rate rate(10.0);
+	ros::Rate rate(30.0);
+	bool success = true;
 
 	while (node.ok())
 	{
 		tf::StampedTransform transform;
-
+		tf::Quaternion attitude;
+		success = true;
+		ros::Time now = ros::Time::now();
+		
 		try
 		{
-			ros::Time now = ros::Time::now();
-			listener.waitForTransform("/ar_marker","/pgr_camera_frame",now,ros::Duration(0.033));
-			listener.lookupTransform("/ar_marker","/pgr_camera_frame",now,transform);
+			//listener.waitForTransform("/ar_marker","/pgr_camera_frame",now,ros::Duration(0.033));
+			listener.lookupTransform("/ar_marker","/pgr_camera_frame",ros::Time(0),transform);
 		}
 		catch(tf::TransformException ex)
 		{
 			//ROS_ERROR("%s",ex.what());
-			packData(0.0,0.0,0.0,0);
-			write(fd,toHeli,16);
-			ros::spinOnce();
-			continue;
+			//write(fd,toHeli,16);
+			//ros::spinOnce();
+			//rate.sleep();
+			//continue;
+			success = false;
 		}
 
-		ROS_INFO("(%f,%f,%f)",transform.getOrigin().x(),transform.getOrigin().y(),transform.getOrigin().z());
-		packData(transform.getOrigin().x(),transform.getOrigin().y(),transform.getOrigin().z(),1);
+		ros::Duration d = ros::Time::now() - transform.stamp_;
+
+		if(d.toSec() > 0.5)
+		{
+			success = false;
+		}
+
+		if(success)
+		{
+			packData(transform.getOrigin().x(),transform.getOrigin().y(),transform.getOrigin().z(),1);
+			attitude = transform.getRotation();
+			btMatrix3x3(attitude).getRPY(roll,pitch,yaw);
+			roll = roll*RAD2DEG;
+			pitch = pitch*RAD2DEG;
+			yaw = yaw*RAD2DEG;
+			ROS_DEBUG("[%06d]:LOC(%f,%f,%f),RPY:(%f,%f,%f)",count++,transform.getOrigin().x(),transform.getOrigin().y(),transform.getOrigin().z(),roll,pitch,yaw);
+			
+		}
+		else
+		{
+			packData(0.0,0.0,0.0,0);
+		}
+
 		write(fd,toHeli,16);
 		ros::spinOnce();
 		rate.sleep();

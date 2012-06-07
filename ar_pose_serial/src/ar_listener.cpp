@@ -164,7 +164,7 @@ int main(int argc, char** argv)
 	poll_events.events = POLLIN | POLLERR;
 	poll_events.revents = 0;
 
-	ros::Rate rate(100.0);
+	ros::Rate rate(30.0);
 	bool success = true;
 
 	while (node.ok())
@@ -210,8 +210,6 @@ int main(int argc, char** argv)
 			yaw = yaw*RAD2DEG;
 			ROS_DEBUG("[%06d]:LOC(%f,%f,%f),RPY:(%f,%f,%f)",count++,transform.getOrigin().x(),transform.getOrigin().y(),transform.getOrigin().z(),roll,pitch,yaw);
 			
-			isauto.data = true;
-			control_status.publish(isauto);
 		}
 		else
 		{
@@ -223,7 +221,9 @@ int main(int argc, char** argv)
 			if(poll_events.revents & POLLIN)
 			{
 				int cnt = read(fd,buf,1);
-				ROS_INFO("Serial received! - %d %x",cnt,buf[0]);
+				ROS_DEBUG("Serial received! - %d %x",cnt,buf[0]);
+				isauto.data = true;
+				control_status.publish(isauto);
 			}
 
 			if(poll_events.revents & POLLERR)

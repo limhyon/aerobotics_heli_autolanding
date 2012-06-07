@@ -22,11 +22,11 @@
                 <param name="marker_pattern" type="string" value="data/4x4/4x4_51.patt"/>
                 <!--<param name="marker_pattern" type="string" value="data/patt.sample1"/>-->
                 <!--<param name="marker_pattern" type="string" value="data/patt.sample2"/>-->
-                <param name="marker_width" type="double" value="202.0"/>
+                <param name="marker_width" type="double" value="190.0"/>
                 <param name="marker_center_x" type="double" value="0.0"/>
                 <param name="marker_center_y" type="double" value="0.0"/>
                 <param name="threshold" type="int" value="100"/>
-                <param name="use_history" type="bool" value="false"/>
+                <param name="use_history" type="bool" value="true"/>
     		<param name="reverse_transform" type="bool" value="true"/>
 		<!--<remap from="usb_cam/camera_info" to="usb_cam_repub/camera_info"/>-->
         </node>

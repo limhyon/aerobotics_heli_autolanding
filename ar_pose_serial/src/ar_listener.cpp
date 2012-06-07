@@ -223,12 +223,12 @@ int main(int argc, char** argv)
 			if(poll_events.revents & POLLIN)
 			{
 				int cnt = read(fd,buf,1);
-				//ROS_INFO("Serial received! - %d %x",cnt,buf[0]);
+				ROS_INFO("Serial received! - %d %x",cnt,buf[0]);
 			}
 
 			if(poll_events.revents & POLLERR)
 			{
-				//ROS_INFO("Poll error!");
+				ROS_INFO("Poll error!");
 			}
 			// res = read(fd,buf,255);
 			// See http://www.faqs.org/docs/Linux-HOWTO/Serial-Programming-HOWTO.html

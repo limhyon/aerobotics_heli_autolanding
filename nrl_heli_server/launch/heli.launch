@@ -3,7 +3,7 @@
   <arg name="camera_node" default="usb_cam" />
   <!--<arg name="calibration_file" default="file://$(find pgr_camera_driver)/test_intrinsics.ini" />-->
   <!--<arg name="calibration_file" default="file://$(find pgr_camera_driver)/fmvu-03mtm-1.6mm.ini" />-->
-	<arg name="calibration_file" default="file://$(find pgr_camera_driver)/fmvu-03mtm-1.6mm-2nd.ini" />
+	<arg name="calibration_file" default="file://$(find pgr_camera_driver)/fmvu-03mtm-3.4mm.ini" />
     
   <node name="$(arg camera_node)" pkg="pgr_camera_driver" type="pgr_camera_node" respawn="false" output="screen">
         <!-- HAS NO EFFECT HERE (b/c parameters are set through dynamic_reconfigure)

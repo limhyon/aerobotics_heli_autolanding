@@ -18,23 +18,14 @@
         <param name="intrinsics_ini" type="str" value="$(arg calibration_file)" />
   </node> 
   
-	<node name="ar_pose" pkg="ar_pose" type="ar_single" respawn="false" output="screen">
-                <param name="marker_pattern" type="string" value="data/4x4/4x4_51.patt"/>
-                <!--<param name="marker_pattern" type="string" value="data/patt.sample1"/>-->
-                <!--<param name="marker_pattern" type="string" value="data/patt.sample2"/>-->
-                <param name="marker_width" type="double" value="202.0"/>
-                <param name="marker_center_x" type="double" value="0.0"/>
-                <param name="marker_center_y" type="double" value="0.0"/>
-                <param name="threshold" type="int" value="100"/>
-                <param name="use_history" type="bool" value="false"/>
-    		<param name="reverse_transform" type="bool" value="true"/>
-		<!--<remap from="usb_cam/camera_info" to="usb_cam_repub/camera_info"/>-->
-        </node>
 
+	<node name="ar_pose" pkg="ar_pose" type="ar_multi" respawn="false" output="screen">
+		<param name="marker_pattern_list" type="string" value="$(find ar_pose)/data/object_4x4"/>
+		<param name="threshold" type="int" value="100"/>
+	</node>
+`
 	<node pkg="tf" type="static_transform_publisher" name="world_to_marker" args="0 0 0 0 0 0 world ar_marker 10" />
-
-	<!-- Serial Output -->
-	<node name="ar_listener" pkg="ar_pose_serial" type="ar_listener" output="screen" respawn="false" args="/dev/ttyS0" />
-
+<node pkg="tf" type="static_transform_publisher" name="world_to_cam"
+                args="0 0 0.5 -1.57 0 -1.57 world usb_cam 1" />
 </launch>
 

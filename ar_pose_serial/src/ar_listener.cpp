@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <sys/signal.h>
+#include <sys/poll.h>
 
 #define BAUDRATE B115200
 #define MODEMDEVICE "/dev/ttyS0"
@@ -39,6 +40,7 @@ union
 unsigned char toHeli[PKT_LENGTH] = {0x00};
 double roll,pitch,yaw;
 bool wait_flag = true;
+char buf[0xff]= {0};
 
 void packData(float x,float y,float z,unsigned char good)
 {
@@ -91,11 +93,6 @@ void packData(float x,float y,float z,unsigned char good)
 	}
 }
 
-void signal_handler_IO(int status)
-{
-	//wait_flag = false;
-}
-
 int main(int argc, char** argv)
 {
 	unsigned int count = 0;
@@ -117,7 +114,9 @@ int main(int argc, char** argv)
 	// Serial comm related
 	int fd;
 	struct termios newtio;
-	struct sigaction saio;
+
+	struct pollfd poll_events;
+	int poll_state;
 	
 	// open, we trust a user should enter /dev/ttyS0 or so.
 	fd = open(argv[1], O_RDWR | O_NOCTTY | O_NONBLOCK); 
@@ -132,15 +131,6 @@ int main(int argc, char** argv)
 	{
 		ROS_INFO("Connected to %s successfully.",argv[1]);
 	}
-
-	saio.sa_handler = signal_handler_IO;
-	//saio.sa_mask = 0;
-	sigemptyset(&saio.sa_mask);
-	saio.sa_flags = 0;
-	saio.sa_restorer = NULL;
-	sigaction(SIGIO,&saio,NULL);
-	fcntl(fd,F_SETOWN,getpid());
-	fcntl(fd,F_SETFL,FASYNC);
 
 	bzero(&newtio, sizeof(newtio)); /* clear struct for new port settings */
 
@@ -169,11 +159,19 @@ int main(int argc, char** argv)
 	tcflush(fd,TCIFLUSH);
 	tcsetattr(fd,TCSANOW,&newtio);
 
-	ros::Rate rate(30.0);
+	// Poll for data receiving.
+	poll_events.fd = fd;
+	poll_events.events = POLLIN | POLLERR;
+	poll_events.revents = 0;
+
+	ros::Rate rate(100.0);
 	bool success = true;
 
 	while (node.ok())
 	{
+
+		poll_state = poll((struct pollfd*)&poll_events,1,0); // immediately return
+
 		std_msgs::Bool isauto;
 		tf::StampedTransform transform;
 		tf::Quaternion attitude;
@@ -220,10 +218,18 @@ int main(int argc, char** argv)
 			packData(0.0,0.0,0.0,0);
 		}
 
-		if(wait_flag == false)
+		if(poll_state > 0)
 		{
-			ROS_INFO("Serial received!");
-			wait_flag = true;
+			if(poll_events.revents & POLLIN)
+			{
+				int cnt = read(fd,buf,1);
+				//ROS_INFO("Serial received! - %d %x",cnt,buf[0]);
+			}
+
+			if(poll_events.revents & POLLERR)
+			{
+				//ROS_INFO("Poll error!");
+			}
 			// res = read(fd,buf,255);
 			// See http://www.faqs.org/docs/Linux-HOWTO/Serial-Programming-HOWTO.html
 		}

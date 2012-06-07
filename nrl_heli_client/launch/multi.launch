@@ -1,0 +1,10 @@
+<launch>
+<node pkg="rviz" type="rviz" name="rviz"
+            args="-d $(find nrl_heli_client)/launch/live_single.vcg"/>
+<node pkg="dynamic_reconfigure" name="reconfig" type="reconfigure_gui" />
+
+<node pkg="image_transport" name="republish" type="republish" args="compressed in:=/usb_cam/image_raw out:=/usb_cam_repub/image_raw">
+<remap from="usb_cam/camera_info" to="/camera_info"/>
+</node>
+</launch>
+

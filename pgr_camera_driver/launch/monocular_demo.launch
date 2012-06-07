@@ -10,13 +10,11 @@
   <arg name="calibration_file" default="file://$(find pgr_camera_driver)/fmvu-03mtm.ini" />
     
   <node name="$(arg camera_node)" pkg="pgr_camera_driver" type="pgr_camera_node" respawn="false" output="screen">
-        <!-- HAS NO EFFECT HERE (b/c parameters are set through dynamic_reconfigure)
         <param name="width" type="int" value="640" /> # Default 640
         <param name="height" type="int" value="480" /> # Default 480
         <param name="format" value="Y8" /> # Y8 works with Color (Don't Select RGB if you don't know)
         <param name="frame_rate" type="int" value="30" />
         <param name="camera_name" type="str" value="pgr_camera" />
-        -->
         
         # NECESSARY:  
         <param name="intrinsics_ini" type="str" value="$(arg calibration_file)" />
@@ -26,5 +24,11 @@
 		respawn="false" output="screen">
 		<remap from="image" to="/$(arg camera_node)/image_raw" />
 	</node>
+<node pkg="camera_calibration" name="cameracalibrator" type="cameracalibrator.py" respawn="true" args="--size 8x6 --square 0.024">
+     <remap from="image" to="/$(arg camera_node)/image_raw"/>
+     <remap from="camera" to="/$(arg camera_node)"/>
+    </node>
+
+        <node pkg="dynamic_reconfigure" name="reconfig" type="reconfigure_gui" />
 </launch>
 

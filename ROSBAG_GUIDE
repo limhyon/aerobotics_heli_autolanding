@@ -1,0 +1,4 @@
+$ rosbag record -a -x "/usb_cam/(.*)" 
+
+
+-x "/usb_cam_repub/image_raw/theora(.*)"

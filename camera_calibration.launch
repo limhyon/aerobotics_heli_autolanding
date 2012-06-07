@@ -1,0 +1,5 @@
+<launch>
+	<node pkg="pgr_camera_driver" name="pgr_camera_node" type="pgr_camera_node"/> 
+	<node pkg="dynamic_reconfigure" name="reconfig" type="reconfigure_gui" />
+	<node pkg="camera_calibration" name="camera_calibration" type="cameracalibrator.py" respawn="true" args="--size 8x6 --square 0.025 image:=/pgr_camera_node/image_raw camera:=/pgr_camera_node"/>
+</launch>

@@ -42,7 +42,7 @@ Tool\ 2D\ Nav\ GoalTopic=goal
 Tool\ 2D\ Pose\ EstimateTopic=initialpose
 Camera\ Type=rviz::OrbitViewController
 Camera\ Config=1.07693 0.461088 5.5806 0 0 0
-Property\ Grid\ State=selection=;expanded=.Global Options,TF./ar_marker/ar_marker,TF./world/world,TF./pgr_camera_frame/pgr_camera_frame,TF.Enabled.TF.Tree,TF./worldTree/world,TF./ar_markerTree/ar_marker,TF./pgr_camera_frameTree/pgr_camera_frame,Markers.Enabled.Markers.Namespaces,Camera.Enabled,Image.Enabled;scrollpos=0,9;splitterpos=466,933;ispageselected=1
+Property\ Grid\ State=selection=Camera.StatusCameraInfo;expanded=.Global Options,TF./ar_marker/ar_marker,TF./world/world,TF./pgr_camera_frame/pgr_camera_frame,TF.Enabled.TF.Tree,TF./worldTree/world,TF./ar_markerTree/ar_marker,TF./pgr_camera_frameTree/pgr_camera_frame,Markers.Enabled.Markers.Namespaces,Camera.Enabled,Camera.Enabled.Camera.StatusTopStatus,Image.Enabled;scrollpos=0,0;splitterpos=273,546;ispageselected=1
 [Display0]
 Name=TF
 Package=rviz

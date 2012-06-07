@@ -2,7 +2,7 @@
   <!-- Variable names -->
   <arg name="respawn" default="false" />
   <arg name="camera_node" default="pgr_camera_node" />
-  <arg name="calibration_file" default="file://$(find catasphereo)/config/camera/pgr_camera_mono_calibration.yaml" />
+  <arg name="calibration_file" default="file://$(find pgr_camera_driver)/config/camera/pgr_camera_mono_calibration.yaml" />
   	
   <include file="$(find pgr_camera_driver)/launch/camera_node.launch">
         <arg name="camera_node"      value="$(arg camera_node)" /> <!-- Fully resolved ? -->
